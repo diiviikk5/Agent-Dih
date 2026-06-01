@@ -20,3 +20,4 @@ jobs:
       - run: node ./bin/dih.js latest ./examples/divik.profile.json
       - run: node ./bin/dih.js summary ./examples/divik.profile.json
       - run: node ./bin/dih.js summary ./examples/divik.profile.json --format json
+      - run: node ./bin/dih.js brief ./examples/divik.profile.json
