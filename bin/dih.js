@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { evaluateFallback } from "../src/evaluator.js";
+import { createRunDir, writeJson, writeText } from "../src/files.js";
+import { initProfile, loadProfile, validateProfile } from "../src/profile.js";
+import { renderReport } from "../src/report.js";
 
 function printHelp() {
   console.log(`Agent Dih
@@ -36,12 +40,41 @@ function argValue(name, fallback = null) {
 }
 
 try {
+  if (command === "init") {
+    const target = resolve(process.cwd(), args[1] || "dih.profile.json");
+    await initProfile(target);
+    console.log(`Created ${target}`);
+    process.exit(0);
+  }
+
   if (command === "check") {
     const path = args[1];
     if (!path) throw new Error("Missing profile path.");
     const profile = JSON.parse(await readFile(resolve(process.cwd(), path), "utf8"));
-    if (!profile.name) throw new Error("Profile must include name.");
+    validateProfile(profile);
     console.log(`Profile OK: ${profile.name}`);
+    process.exit(0);
+  }
+
+  if (command === "test") {
+    const url = args[1];
+    const profilePath = argValue("--profile");
+    const goal = argValue("--goal", "decide whether to continue");
+    if (!url) throw new Error("Missing URL.");
+    if (!profilePath) throw new Error("Missing --profile.");
+
+    const absoluteProfilePath = resolve(process.cwd(), profilePath);
+    const profile = await loadProfile(absoluteProfilePath);
+    const runDir = await createRunDir(dirname(absoluteProfilePath), profile.name);
+    const result = evaluateFallback({ url, goal, profile });
+    const report = renderReport({ url, goal, profile, result });
+
+    await writeJson(join(runDir, "trace.json"), { url, goal, profile, result });
+    await writeText(join(runDir, "report.md"), report);
+
+    console.log(`Agent Dih run complete: ${result.verdict}`);
+    console.log(`Run directory: ${runDir}`);
+    console.log(`Report: ${join(runDir, "report.md")}`);
     process.exit(0);
   }
 

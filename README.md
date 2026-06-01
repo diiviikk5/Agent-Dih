@@ -16,6 +16,15 @@ npm run check
 npm run demo
 ```
 
+Runs create:
+
+```txt
+.dih/runs/<timestamp>-<profile>/
+  report.md
+  trace.json
+  artifacts/
+```
+
 ## Commands
 
 ```bash
