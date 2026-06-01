@@ -15,6 +15,7 @@ function printHelp() {
 Usage:
   dih init [profile.json]
   dih profiles
+  dih evidence <url>
   dih check <profile.json>
   dih explain <profile.json>
   dih test <url> --profile <profile.json> --goal "<goal>"
@@ -70,6 +71,13 @@ try {
       const profile = await loadProfile(join(examplesDir, file));
       console.log(`${profile.name}\t${file}\t${profile.summary || ""}`);
     }
+    process.exit(0);
+  }
+
+  if (command === "evidence") {
+    const url = args[1];
+    if (!url) throw new Error("Missing URL.");
+    console.log(JSON.stringify(await collectPageEvidence(url), null, 2));
     process.exit(0);
   }
 
