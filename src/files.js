@@ -19,6 +19,17 @@ export async function writeText(path, value) {
 
 export async function latestRun(rootDir) {
   const runsDir = join(rootDir, ".dih", "runs");
+  const runs = await listRuns(rootDir);
+  if (runs.length === 0) throw new Error(`No runs found in ${runsDir}`);
+  return {
+    runDir: runs[0].runDir,
+    reportPath: join(runs[0].runDir, "report.md"),
+    tracePath: join(runs[0].runDir, "trace.json")
+  };
+}
+
+export async function listRuns(rootDir) {
+  const runsDir = join(rootDir, ".dih", "runs");
   const entries = await readdir(runsDir, { withFileTypes: true });
   const runs = await Promise.all(
     entries
@@ -29,12 +40,6 @@ export async function latestRun(rootDir) {
         return { runDir, mtimeMs: info.mtimeMs };
       })
   );
-
-  if (runs.length === 0) throw new Error(`No runs found in ${runsDir}`);
   runs.sort((a, b) => b.mtimeMs - a.mtimeMs);
-  return {
-    runDir: runs[0].runDir,
-    reportPath: join(runs[0].runDir, "report.md"),
-    tracePath: join(runs[0].runDir, "trace.json")
-  };
+  return runs;
 }

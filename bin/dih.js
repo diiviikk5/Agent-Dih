@@ -4,7 +4,7 @@ import { dirname, join, resolve } from "node:path";
 import { formatAdapters, listAdapters, runBrowserAdapter } from "../src/adapters.js";
 import { renderBrief } from "../src/brief.js";
 import { evaluateFallback } from "../src/evaluator.js";
-import { createRunDir, latestRun, writeJson, writeText } from "../src/files.js";
+import { createRunDir, latestRun, listRuns, writeJson, writeText } from "../src/files.js";
 import { collectPageEvidence } from "../src/pageEvidence.js";
 import { explainProfile, initProfile, loadProfile, validateProfile } from "../src/profile.js";
 import { renderReport } from "../src/report.js";
@@ -20,6 +20,7 @@ Usage:
   dih explain <profile.json>
   dih test <url> --profile <profile.json> --goal "<goal>"
   dih compare <url...> --profile <profile.json> --goal "<goal>"
+  dih runs <profile.json>
   dih latest <profile.json>
   dih summary <profile.json> [--format text|json]
   dih brief <profile.json>
@@ -106,6 +107,17 @@ try {
     console.log(`Latest run: ${latest.runDir}`);
     console.log(`Report: ${latest.reportPath}`);
     console.log(`Trace: ${latest.tracePath}`);
+    process.exit(0);
+  }
+
+  if (command === "runs") {
+    const path = args[1];
+    if (!path) throw new Error("Missing profile path.");
+    const absoluteProfilePath = resolve(process.cwd(), path);
+    const runs = await listRuns(dirname(absoluteProfilePath));
+    for (const run of runs.slice(0, 10)) {
+      console.log(run.runDir);
+    }
     process.exit(0);
   }
 

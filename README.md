@@ -36,6 +36,7 @@ node ./bin/dih.js evidence https://example.com
 node ./bin/dih.js explain ./examples/divik.profile.json
 node ./bin/dih.js test https://example.com --profile ./examples/divik.profile.json --goal "decide if this product is worth trying"
 node ./bin/dih.js compare https://example.com https://vercel.com --profile ./examples/divik.profile.json --goal "pick the more interesting product"
+node ./bin/dih.js runs ./examples/divik.profile.json
 node ./bin/dih.js latest ./examples/divik.profile.json
 node ./bin/dih.js summary ./examples/divik.profile.json
 node ./bin/dih.js summary ./examples/divik.profile.json --format json
