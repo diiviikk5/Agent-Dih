@@ -1,3 +1,5 @@
+import { recommendations } from "./recommendations.js";
+
 export function renderBrief({ trace, reportPath }) {
   const result = trace.result || trace.results?.[0]?.result;
   if (!result) throw new Error("Trace does not include a result.");
@@ -19,6 +21,12 @@ export function renderBrief({ trace, reportPath }) {
     ...(rules.length
       ? rules.slice(0, 3).map((rule) => `- ${rule.reason}`)
       : ["- No major profile-specific blockers were triggered."]),
+    "",
+    "## Best Fixes",
+    "",
+    ...(recommendations(result).length
+      ? recommendations(result).slice(0, 3).map((item) => `- ${item}`)
+      : ["- No specific fixes recommended."]),
     "",
     "## Scores",
     "",
