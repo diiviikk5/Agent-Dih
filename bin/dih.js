@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { formatAdapters, listAdapters, runBrowserAdapter } from "../src/adapters.js";
 import { evaluateFallback } from "../src/evaluator.js";
-import { createRunDir, writeJson, writeText } from "../src/files.js";
+import { createRunDir, latestRun, writeJson, writeText } from "../src/files.js";
 import { initProfile, loadProfile, validateProfile } from "../src/profile.js";
 import { renderReport } from "../src/report.js";
 
@@ -14,6 +14,7 @@ Usage:
   dih init [profile.json]
   dih check <profile.json>
   dih test <url> --profile <profile.json> --goal "<goal>"
+  dih latest <profile.json>
   dih adapters
 
 Environment adapters:
@@ -59,6 +60,17 @@ try {
     const profile = JSON.parse(await readFile(resolve(process.cwd(), path), "utf8"));
     validateProfile(profile);
     console.log(`Profile OK: ${profile.name}`);
+    process.exit(0);
+  }
+
+  if (command === "latest") {
+    const path = args[1];
+    if (!path) throw new Error("Missing profile path.");
+    const absoluteProfilePath = resolve(process.cwd(), path);
+    const latest = await latestRun(dirname(absoluteProfilePath));
+    console.log(`Latest run: ${latest.runDir}`);
+    console.log(`Report: ${latest.reportPath}`);
+    console.log(`Trace: ${latest.tracePath}`);
     process.exit(0);
   }
 

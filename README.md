@@ -31,4 +31,5 @@ Runs create:
 ```bash
 node ./bin/dih.js check ./examples/divik.profile.json
 node ./bin/dih.js test https://example.com --profile ./examples/divik.profile.json --goal "decide if this product is worth trying"
+node ./bin/dih.js latest ./examples/divik.profile.json
 ```

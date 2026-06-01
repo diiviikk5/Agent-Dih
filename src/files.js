@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readdir, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 export async function createRunDir(rootDir, profileName) {
@@ -15,4 +15,26 @@ export async function writeJson(path, value) {
 
 export async function writeText(path, value) {
   await writeFile(path, value, "utf8");
+}
+
+export async function latestRun(rootDir) {
+  const runsDir = join(rootDir, ".dih", "runs");
+  const entries = await readdir(runsDir, { withFileTypes: true });
+  const runs = await Promise.all(
+    entries
+      .filter((entry) => entry.isDirectory())
+      .map(async (entry) => {
+        const runDir = join(runsDir, entry.name);
+        const info = await stat(runDir);
+        return { runDir, mtimeMs: info.mtimeMs };
+      })
+  );
+
+  if (runs.length === 0) throw new Error(`No runs found in ${runsDir}`);
+  runs.sort((a, b) => b.mtimeMs - a.mtimeMs);
+  return {
+    runDir: runs[0].runDir,
+    reportPath: join(runs[0].runDir, "report.md"),
+    tracePath: join(runs[0].runDir, "trace.json")
+  };
 }
