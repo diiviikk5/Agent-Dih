@@ -23,6 +23,7 @@ Runs create:
 .dih/runs/<timestamp>-<profile>/
   report.md
   trace.json
+  compare.csv
   artifacts/
 ```
 

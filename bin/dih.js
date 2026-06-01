@@ -3,6 +3,7 @@ import { readdir, readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { formatAdapters, listAdapters, runBrowserAdapter } from "../src/adapters.js";
 import { renderBrief } from "../src/brief.js";
+import { compareCsv } from "../src/csv.js";
 import { evaluateFallback } from "../src/evaluator.js";
 import { createRunDir, latestRun, listRuns, writeJson, writeText } from "../src/files.js";
 import { collectPageEvidence } from "../src/pageEvidence.js";
@@ -218,6 +219,7 @@ try {
 
     await writeJson(join(runDir, "trace.json"), { goal, profile, results });
     await writeText(join(runDir, "report.md"), report);
+    await writeText(join(runDir, "compare.csv"), compareCsv(results));
     console.log(`Agent Dih compare complete: ${results[0].url}`);
     console.log(`Run directory: ${runDir}`);
     console.log(`Report: ${join(runDir, "report.md")}`);
