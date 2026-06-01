@@ -1,3 +1,5 @@
+import { recommendations } from "./recommendations.js";
+
 export function renderReport({ url, goal, profile, result }) {
   return [
     `# Agent Dih Report`,
@@ -36,6 +38,12 @@ export function renderReport({ url, goal, profile, result }) {
     ...(result.ruleHits?.length
       ? result.ruleHits.map((rule) => `- **${rule.id}** (${rule.severity}): ${rule.reason} Evidence: ${rule.evidence}`)
       : ["- None."]),
+    "",
+    "## Recommendations",
+    "",
+    ...(recommendations(result).length
+      ? recommendations(result).map((item) => `- ${item}`)
+      : ["- No specific recommendations."]),
     "",
     "## Next Best Test",
     "",
