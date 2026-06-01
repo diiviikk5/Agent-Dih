@@ -13,10 +13,14 @@ jobs:
         with:
           node-version: 22
       - run: npm run check
+      - run: node ./bin/dih.js check ./examples/founder.profile.json
+      - run: node ./bin/dih.js profiles
       - run: node ./bin/dih.js explain ./examples/divik.profile.json
+      - run: node ./bin/dih.js evidence https://example.com
       - run: node ./bin/dih.js adapters
       - run: npm run demo
       - run: node ./bin/dih.js compare https://example.com https://vercel.com --profile ./examples/divik.profile.json --goal "pick the more interesting product"
+      - run: node ./bin/dih.js runs ./examples/divik.profile.json
       - run: node ./bin/dih.js latest ./examples/divik.profile.json
       - run: node ./bin/dih.js summary ./examples/divik.profile.json
       - run: node ./bin/dih.js summary ./examples/divik.profile.json --format json
