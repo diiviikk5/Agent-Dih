@@ -36,4 +36,5 @@ node ./bin/dih.js compare https://example.com https://vercel.com --profile ./exa
 node ./bin/dih.js latest ./examples/divik.profile.json
 node ./bin/dih.js summary ./examples/divik.profile.json
 node ./bin/dih.js summary ./examples/divik.profile.json --format json
+node ./bin/dih.js brief ./examples/divik.profile.json
 ```

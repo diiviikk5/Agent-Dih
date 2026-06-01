@@ -2,6 +2,7 @@
 import { readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { formatAdapters, listAdapters, runBrowserAdapter } from "../src/adapters.js";
+import { renderBrief } from "../src/brief.js";
 import { evaluateFallback } from "../src/evaluator.js";
 import { createRunDir, latestRun, writeJson, writeText } from "../src/files.js";
 import { collectPageEvidence } from "../src/pageEvidence.js";
@@ -19,6 +20,7 @@ Usage:
   dih compare <url...> --profile <profile.json> --goal "<goal>"
   dih latest <profile.json>
   dih summary <profile.json> [--format text|json]
+  dih brief <profile.json>
   dih adapters
 
 Environment adapters:
@@ -113,6 +115,16 @@ try {
     console.log(`Friction: ${result.scores.friction}/100`);
     console.log(`Conversion: ${result.scores.conversion}/100`);
     console.log(`Report: ${latest.reportPath}`);
+    process.exit(0);
+  }
+
+  if (command === "brief") {
+    const path = args[1];
+    if (!path) throw new Error("Missing profile path.");
+    const absoluteProfilePath = resolve(process.cwd(), path);
+    const latest = await latestRun(dirname(absoluteProfilePath));
+    const trace = JSON.parse(await readFile(latest.tracePath, "utf8"));
+    console.log(renderBrief({ trace, reportPath: latest.reportPath }));
     process.exit(0);
   }
 
