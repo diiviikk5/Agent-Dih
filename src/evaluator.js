@@ -1,4 +1,5 @@
 import { applyDecisionRules } from "./rules.js";
+import { positiveSignals } from "./signals.js";
 
 export function evaluateFallback({ url, goal, profile, browserResult = null, pageEvidence = null }) {
   const urlText = url.toLowerCase();
@@ -15,6 +16,7 @@ export function evaluateFallback({ url, goal, profile, browserResult = null, pag
       signals.push(`Matches preference: ${like}`);
     }
   }
+  signals.push(...positiveSignals({ profile, pageEvidence }));
 
   if (profile.patience?.leavesIfPricingHidden) {
     concerns.push("Will drop off quickly if pricing is hidden or gated behind sales.");
