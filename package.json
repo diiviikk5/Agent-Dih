@@ -1,0 +1,24 @@
+{
+  "name": "agent-dih",
+  "version": "0.1.0",
+  "description": "Personal website-testing agents that browse, judge, and report like a specific user.",
+  "type": "module",
+  "bin": {
+    "dih": "./bin/dih.js"
+  },
+  "scripts": {
+    "check": "node ./bin/dih.js check ./examples/divik.profile.json",
+    "demo": "node ./bin/dih.js test https://example.com --profile ./examples/divik.profile.json --goal \"decide if this product is worth trying\""
+  },
+  "keywords": [
+    "agents",
+    "persona",
+    "browser-agents",
+    "synthetic-users",
+    "website-testing"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}

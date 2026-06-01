@@ -1,0 +1,38 @@
+{
+  "name": "divik",
+  "summary": "A skeptical, fast-moving builder who likes useful AI infrastructure, clear demos, and non-cringey product taste.",
+  "budget": {
+    "maxImpulseBuyUsd": 20,
+    "maxResearchBuyUsd": 100
+  },
+  "patience": {
+    "maxSignupSteps": 3,
+    "leavesIfPricingHidden": true,
+    "leavesIfDemoMissing": true
+  },
+  "preferences": {
+    "likes": [
+      "useful devtools",
+      "clear demos",
+      "simple UI",
+      "agent infrastructure",
+      "transparent pricing"
+    ],
+    "dislikes": [
+      "vague AI wrappers",
+      "forced signup",
+      "enterprise-only pricing",
+      "cringey branding",
+      "unclear outcome"
+    ]
+  },
+  "risk": {
+    "avoidsUnknownPaymentPages": true,
+    "requiresRefundPolicy": true,
+    "requiresClearDataPolicy": true
+  },
+  "writingStyle": {
+    "tone": "direct, casual, skeptical",
+    "notes": "Prefers blunt observations and concrete reasons over generic praise."
+  }
+}
