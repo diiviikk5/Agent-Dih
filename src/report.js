@@ -8,6 +8,7 @@ export function renderReport({ url, goal, profile, result }) {
     `Mode: ${result.mode}`,
     result.pageEvidence?.title ? `Page title: ${result.pageEvidence.title}` : "",
     result.pageEvidence?.description ? `Meta description: ${result.pageEvidence.description}` : "",
+    result.pageEvidence?.pricesUsd?.length ? `Detected prices: ${result.pageEvidence.pricesUsd.map((price) => `$${price}`).join(", ")}` : "",
     "",
     "## Scores",
     "",

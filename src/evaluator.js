@@ -8,6 +8,7 @@ export function evaluateFallback({ url, goal, profile, browserResult = null, pag
 
   const signals = [];
   const concerns = [];
+  const prices = pageEvidence?.pricesUsd || [];
 
   for (const like of likes) {
     if (goalText.includes(like.toLowerCase()) || urlText.includes(tokenize(like)[0] || "")) {
@@ -24,13 +25,17 @@ export function evaluateFallback({ url, goal, profile, browserResult = null, pag
   if (profile.risk?.requiresRefundPolicy) {
     concerns.push("Needs refund or cancellation policy before payment.");
   }
+  if (prices.some((price) => price > profile.budget.maxResearchBuyUsd)) {
+    concerns.push(`Saw price above research budget of $${profile.budget.maxResearchBuyUsd}.`);
+  }
 
   const ruleHits = applyDecisionRules({ profile, evidence: pageEvidence || {} });
   const dislikeHits = dislikes.slice(0, 3).map((item) => `Sensitive to: ${item}`);
   const highSeverityRules = ruleHits.filter((rule) => rule.severity === "high").length;
   const trust = clamp(55 + signals.length * 8 - concerns.length * 3 - highSeverityRules * 7);
-  const fit = clamp(50 + signals.length * 10 - dislikeHits.length * 4);
-  const friction = clamp(35 + concerns.length * 7 + ruleHits.length * 4);
+  const overBudgetPenalty = prices.some((price) => price > profile.budget.maxResearchBuyUsd) ? 12 : 0;
+  const fit = clamp(50 + signals.length * 10 - dislikeHits.length * 4 - overBudgetPenalty);
+  const friction = clamp(35 + concerns.length * 7 + ruleHits.length * 4 + overBudgetPenalty);
   const conversion = clamp(Math.round((trust + fit + (100 - friction)) / 3));
 
   return {

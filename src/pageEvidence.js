@@ -29,6 +29,7 @@ export function extractEvidence({ url, status, html }) {
     fetched: true,
     title: clean(title),
     description: clean(description),
+    pricesUsd: extractUsdPrices(text),
     signals: {
       hasPricing: containsAny(text, ["pricing", "price", "$", "free trial"]),
       hasDemo: containsAny(text, ["demo", "preview", "screenshot", "watch", "try it"]),
@@ -37,6 +38,13 @@ export function extractEvidence({ url, status, html }) {
       hasForcedSales: containsAny(text, ["contact sales", "book a demo", "talk to sales"])
     }
   };
+}
+
+function extractUsdPrices(text) {
+  const prices = [...text.matchAll(/\$\s?(\d+(?:\.\d{1,2})?)/g)]
+    .map((match) => Number(match[1]))
+    .filter((value) => Number.isFinite(value));
+  return [...new Set(prices)].slice(0, 10);
 }
 
 function containsAny(text, needles) {
