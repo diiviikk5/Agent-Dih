@@ -15,4 +15,5 @@ jobs:
       - run: npm run check
       - run: node ./bin/dih.js adapters
       - run: npm run demo
+      - run: node ./bin/dih.js compare https://example.com https://vercel.com --profile ./examples/divik.profile.json --goal "pick the more interesting product"
       - run: node ./bin/dih.js latest ./examples/divik.profile.json
