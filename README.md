@@ -14,6 +14,7 @@ The point is not "AI user testing." The point is a reusable synthetic version of
 ```bash
 npm run check
 npm run demo
+node ./bin/dih.js adapters
 ```
 
 Runs create:

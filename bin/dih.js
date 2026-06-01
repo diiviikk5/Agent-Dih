@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
+import { formatAdapters, listAdapters, runBrowserAdapter } from "../src/adapters.js";
 import { evaluateFallback } from "../src/evaluator.js";
 import { createRunDir, writeJson, writeText } from "../src/files.js";
 import { initProfile, loadProfile, validateProfile } from "../src/profile.js";
@@ -40,6 +41,11 @@ function argValue(name, fallback = null) {
 }
 
 try {
+  if (command === "adapters") {
+    console.log(formatAdapters(await listAdapters()));
+    process.exit(0);
+  }
+
   if (command === "init") {
     const target = resolve(process.cwd(), args[1] || "dih.profile.json");
     await initProfile(target);
@@ -66,10 +72,14 @@ try {
     const absoluteProfilePath = resolve(process.cwd(), profilePath);
     const profile = await loadProfile(absoluteProfilePath);
     const runDir = await createRunDir(dirname(absoluteProfilePath), profile.name);
-    const result = evaluateFallback({ url, goal, profile });
+    const browserResult = await runBrowserAdapter({ url, goal, profile, runDir });
+    const result = evaluateFallback({ url, goal, profile, browserResult });
     const report = renderReport({ url, goal, profile, result });
 
-    await writeJson(join(runDir, "trace.json"), { url, goal, profile, result });
+    if (browserResult) {
+      await writeText(join(runDir, "artifacts", "browser-adapter-output.txt"), [browserResult.stdout, browserResult.stderr].join("\n"));
+    }
+    await writeJson(join(runDir, "trace.json"), { url, goal, profile, browserResult, result });
     await writeText(join(runDir, "report.md"), report);
 
     console.log(`Agent Dih run complete: ${result.verdict}`);

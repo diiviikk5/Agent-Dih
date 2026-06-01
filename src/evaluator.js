@@ -1,4 +1,4 @@
-export function evaluateFallback({ url, goal, profile }) {
+export function evaluateFallback({ url, goal, profile, browserResult = null }) {
   const urlText = url.toLowerCase();
   const goalText = goal.toLowerCase();
   const likes = profile.preferences?.likes || [];
@@ -30,7 +30,7 @@ export function evaluateFallback({ url, goal, profile }) {
   const conversion = clamp(Math.round((trust + fit + (100 - friction)) / 3));
 
   return {
-    mode: "fallback",
+    mode: browserResult ? "browser-assisted" : "fallback",
     scores: {
       fit,
       trust,
