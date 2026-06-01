@@ -17,6 +17,7 @@ Usage:
   dih test <url> --profile <profile.json> --goal "<goal>"
   dih compare <url...> --profile <profile.json> --goal "<goal>"
   dih latest <profile.json>
+  dih summary <profile.json>
   dih adapters
 
 Environment adapters:
@@ -73,6 +74,24 @@ try {
     console.log(`Latest run: ${latest.runDir}`);
     console.log(`Report: ${latest.reportPath}`);
     console.log(`Trace: ${latest.tracePath}`);
+    process.exit(0);
+  }
+
+  if (command === "summary") {
+    const path = args[1];
+    if (!path) throw new Error("Missing profile path.");
+    const absoluteProfilePath = resolve(process.cwd(), path);
+    const latest = await latestRun(dirname(absoluteProfilePath));
+    const trace = JSON.parse(await readFile(latest.tracePath, "utf8"));
+    const result = trace.result || trace.results?.[0]?.result;
+    if (!result) throw new Error("Latest trace does not include a result.");
+    console.log(`Verdict: ${result.verdict}`);
+    console.log(`Mode: ${result.mode}`);
+    console.log(`Fit: ${result.scores.fit}/100`);
+    console.log(`Trust: ${result.scores.trust}/100`);
+    console.log(`Friction: ${result.scores.friction}/100`);
+    console.log(`Conversion: ${result.scores.conversion}/100`);
+    console.log(`Report: ${latest.reportPath}`);
     process.exit(0);
   }
 
