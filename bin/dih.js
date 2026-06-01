@@ -14,6 +14,7 @@ Usage:
   dih init [profile.json]
   dih check <profile.json>
   dih test <url> --profile <profile.json> --goal "<goal>"
+  dih compare <url...> --profile <profile.json> --goal "<goal>"
   dih latest <profile.json>
   dih adapters
 
@@ -95,6 +96,43 @@ try {
     await writeText(join(runDir, "report.md"), report);
 
     console.log(`Agent Dih run complete: ${result.verdict}`);
+    console.log(`Run directory: ${runDir}`);
+    console.log(`Report: ${join(runDir, "report.md")}`);
+    process.exit(0);
+  }
+
+  if (command === "compare") {
+    const profilePath = argValue("--profile");
+    const goal = argValue("--goal", "decide which option is best");
+    if (!profilePath) throw new Error("Missing --profile.");
+    const urls = args.slice(1, args.indexOf("--profile") >= 0 ? args.indexOf("--profile") : args.length);
+    if (urls.length < 2) throw new Error("Compare needs at least two URLs before --profile.");
+
+    const absoluteProfilePath = resolve(process.cwd(), profilePath);
+    const profile = await loadProfile(absoluteProfilePath);
+    const runDir = await createRunDir(dirname(absoluteProfilePath), `${profile.name}-compare`);
+    const results = [];
+
+    for (const url of urls) {
+      const result = evaluateFallback({ url, goal, profile });
+      results.push({ url, result });
+    }
+
+    results.sort((a, b) => b.result.scores.conversion - a.result.scores.conversion);
+    const report = [
+      "# Agent Dih Compare",
+      "",
+      `Profile: **${profile.name}**`,
+      `Goal: ${goal}`,
+      "",
+      "| Rank | URL | Verdict | Conversion | Fit | Trust | Friction |",
+      "| --- | --- | --- | ---: | ---: | ---: | ---: |",
+      ...results.map((item, index) => `| ${index + 1} | ${item.url} | ${item.result.verdict} | ${item.result.scores.conversion} | ${item.result.scores.fit} | ${item.result.scores.trust} | ${item.result.scores.friction} |`)
+    ].join("\n");
+
+    await writeJson(join(runDir, "trace.json"), { goal, profile, results });
+    await writeText(join(runDir, "report.md"), report);
+    console.log(`Agent Dih compare complete: ${results[0].url}`);
     console.log(`Run directory: ${runDir}`);
     console.log(`Report: ${join(runDir, "report.md")}`);
     process.exit(0);
