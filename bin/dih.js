@@ -18,7 +18,7 @@ Usage:
   dih test <url> --profile <profile.json> --goal "<goal>"
   dih compare <url...> --profile <profile.json> --goal "<goal>"
   dih latest <profile.json>
-  dih summary <profile.json>
+  dih summary <profile.json> [--format text|json]
   dih adapters
 
 Environment adapters:
@@ -44,6 +44,8 @@ function argValue(name, fallback = null) {
   const index = args.indexOf(name);
   return index >= 0 ? args[index + 1] : fallback;
 }
+
+const format = argValue("--format", "text");
 
 try {
   if (command === "adapters") {
@@ -94,6 +96,16 @@ try {
     const trace = JSON.parse(await readFile(latest.tracePath, "utf8"));
     const result = trace.result || trace.results?.[0]?.result;
     if (!result) throw new Error("Latest trace does not include a result.");
+    const summary = {
+      verdict: result.verdict,
+      mode: result.mode,
+      scores: result.scores,
+      reportPath: latest.reportPath
+    };
+    if (format === "json") {
+      console.log(JSON.stringify(summary, null, 2));
+      process.exit(0);
+    }
     console.log(`Verdict: ${result.verdict}`);
     console.log(`Mode: ${result.mode}`);
     console.log(`Fit: ${result.scores.fit}/100`);
