@@ -1,0 +1,38 @@
+{
+  "name": "busy-founder",
+  "summary": "A time-poor startup founder who wants clear ROI, proof, and low setup friction before trying a product.",
+  "budget": {
+    "maxImpulseBuyUsd": 50,
+    "maxResearchBuyUsd": 300
+  },
+  "patience": {
+    "maxSignupSteps": 2,
+    "leavesIfPricingHidden": true,
+    "leavesIfDemoMissing": false
+  },
+  "preferences": {
+    "likes": [
+      "clear ROI",
+      "case studies",
+      "fast onboarding",
+      "automation",
+      "team workflows"
+    ],
+    "dislikes": [
+      "unclear pricing",
+      "long onboarding",
+      "no customer proof",
+      "manual setup",
+      "generic AI claims"
+    ]
+  },
+  "risk": {
+    "avoidsUnknownPaymentPages": true,
+    "requiresRefundPolicy": false,
+    "requiresClearDataPolicy": true
+  },
+  "writingStyle": {
+    "tone": "brief, pragmatic, ROI-focused",
+    "notes": "Wants the business impact first and implementation detail second."
+  }
+}
