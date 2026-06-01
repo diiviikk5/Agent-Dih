@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { formatAdapters, listAdapters, runBrowserAdapter } from "../src/adapters.js";
 import { renderBrief } from "../src/brief.js";
@@ -14,6 +14,7 @@ function printHelp() {
 
 Usage:
   dih init [profile.json]
+  dih profiles
   dih check <profile.json>
   dih explain <profile.json>
   dih test <url> --profile <profile.json> --goal "<goal>"
@@ -59,6 +60,16 @@ try {
     const target = resolve(process.cwd(), args[1] || "dih.profile.json");
     await initProfile(target);
     console.log(`Created ${target}`);
+    process.exit(0);
+  }
+
+  if (command === "profiles") {
+    const examplesDir = resolve(process.cwd(), "examples");
+    const files = (await readdir(examplesDir)).filter((file) => file.endsWith(".profile.json"));
+    for (const file of files) {
+      const profile = await loadProfile(join(examplesDir, file));
+      console.log(`${profile.name}\t${file}\t${profile.summary || ""}`);
+    }
     process.exit(0);
   }
 
