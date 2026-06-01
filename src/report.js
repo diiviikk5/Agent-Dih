@@ -6,6 +6,8 @@ export function renderReport({ url, goal, profile, result }) {
     `URL: ${url}`,
     `Goal: ${goal}`,
     `Mode: ${result.mode}`,
+    result.pageEvidence?.title ? `Page title: ${result.pageEvidence.title}` : "",
+    result.pageEvidence?.description ? `Meta description: ${result.pageEvidence.description}` : "",
     "",
     "## Scores",
     "",
@@ -31,7 +33,7 @@ export function renderReport({ url, goal, profile, result }) {
     "## Triggered Rules",
     "",
     ...(result.ruleHits?.length
-      ? result.ruleHits.map((rule) => `- **${rule.id}** (${rule.severity}): ${rule.reason}`)
+      ? result.ruleHits.map((rule) => `- **${rule.id}** (${rule.severity}): ${rule.reason} Evidence: ${rule.evidence}`)
       : ["- None."]),
     "",
     "## Next Best Test",

@@ -4,6 +4,7 @@ import { dirname, join, resolve } from "node:path";
 import { formatAdapters, listAdapters, runBrowserAdapter } from "../src/adapters.js";
 import { evaluateFallback } from "../src/evaluator.js";
 import { createRunDir, latestRun, writeJson, writeText } from "../src/files.js";
+import { collectPageEvidence } from "../src/pageEvidence.js";
 import { initProfile, loadProfile, validateProfile } from "../src/profile.js";
 import { renderReport } from "../src/report.js";
 
@@ -85,14 +86,15 @@ try {
     const absoluteProfilePath = resolve(process.cwd(), profilePath);
     const profile = await loadProfile(absoluteProfilePath);
     const runDir = await createRunDir(dirname(absoluteProfilePath), profile.name);
+    const pageEvidence = await collectPageEvidence(url);
     const browserResult = await runBrowserAdapter({ url, goal, profile, runDir });
-    const result = evaluateFallback({ url, goal, profile, browserResult });
+    const result = evaluateFallback({ url, goal, profile, browserResult, pageEvidence });
     const report = renderReport({ url, goal, profile, result });
 
     if (browserResult) {
       await writeText(join(runDir, "artifacts", "browser-adapter-output.txt"), [browserResult.stdout, browserResult.stderr].join("\n"));
     }
-    await writeJson(join(runDir, "trace.json"), { url, goal, profile, browserResult, result });
+    await writeJson(join(runDir, "trace.json"), { url, goal, profile, pageEvidence, browserResult, result });
     await writeText(join(runDir, "report.md"), report);
 
     console.log(`Agent Dih run complete: ${result.verdict}`);
@@ -114,8 +116,9 @@ try {
     const results = [];
 
     for (const url of urls) {
-      const result = evaluateFallback({ url, goal, profile });
-      results.push({ url, result });
+      const pageEvidence = await collectPageEvidence(url);
+      const result = evaluateFallback({ url, goal, profile, pageEvidence });
+      results.push({ url, pageEvidence, result });
     }
 
     results.sort((a, b) => b.result.scores.conversion - a.result.scores.conversion);

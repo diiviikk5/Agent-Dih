@@ -1,6 +1,6 @@
 import { applyDecisionRules } from "./rules.js";
 
-export function evaluateFallback({ url, goal, profile, browserResult = null }) {
+export function evaluateFallback({ url, goal, profile, browserResult = null, pageEvidence = null }) {
   const urlText = url.toLowerCase();
   const goalText = goal.toLowerCase();
   const likes = profile.preferences?.likes || [];
@@ -25,7 +25,7 @@ export function evaluateFallback({ url, goal, profile, browserResult = null }) {
     concerns.push("Needs refund or cancellation policy before payment.");
   }
 
-  const ruleHits = applyDecisionRules({ profile, evidence: {} });
+  const ruleHits = applyDecisionRules({ profile, evidence: pageEvidence || {} });
   const dislikeHits = dislikes.slice(0, 3).map((item) => `Sensitive to: ${item}`);
   const highSeverityRules = ruleHits.filter((rule) => rule.severity === "high").length;
   const trust = clamp(55 + signals.length * 8 - concerns.length * 3 - highSeverityRules * 7);
@@ -34,7 +34,7 @@ export function evaluateFallback({ url, goal, profile, browserResult = null }) {
   const conversion = clamp(Math.round((trust + fit + (100 - friction)) / 3));
 
   return {
-    mode: browserResult ? "browser-assisted" : "fallback",
+    mode: browserResult ? "browser-assisted" : pageEvidence?.fetched ? "page-evidence" : "fallback",
     scores: {
       fit,
       trust,
@@ -58,6 +58,7 @@ export function evaluateFallback({ url, goal, profile, browserResult = null }) {
     signals,
     concerns: [...concerns, ...dislikeHits],
     ruleHits,
+    pageEvidence,
     verdict: conversion >= 70 ? "continue" : conversion >= 45 ? "hesitate" : "leave"
   };
 }
