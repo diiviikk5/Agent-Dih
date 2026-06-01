@@ -28,6 +28,12 @@ export function renderReport({ url, goal, profile, result }) {
     "",
     ...(result.concerns.length ? result.concerns.map((item) => `- ${item}`) : ["- None."]),
     "",
+    "## Triggered Rules",
+    "",
+    ...(result.ruleHits?.length
+      ? result.ruleHits.map((rule) => `- **${rule.id}** (${rule.severity}): ${rule.reason}`)
+      : ["- None."]),
+    "",
     "## Next Best Test",
     "",
     "Run with `agent-browser` installed to capture real clicks, screenshots, and page evidence."

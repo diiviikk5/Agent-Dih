@@ -1,3 +1,5 @@
+import { applyDecisionRules } from "./rules.js";
+
 export function evaluateFallback({ url, goal, profile, browserResult = null }) {
   const urlText = url.toLowerCase();
   const goalText = goal.toLowerCase();
@@ -23,10 +25,12 @@ export function evaluateFallback({ url, goal, profile, browserResult = null }) {
     concerns.push("Needs refund or cancellation policy before payment.");
   }
 
+  const ruleHits = applyDecisionRules({ profile, evidence: {} });
   const dislikeHits = dislikes.slice(0, 3).map((item) => `Sensitive to: ${item}`);
-  const trust = clamp(55 + signals.length * 8 - concerns.length * 3);
+  const highSeverityRules = ruleHits.filter((rule) => rule.severity === "high").length;
+  const trust = clamp(55 + signals.length * 8 - concerns.length * 3 - highSeverityRules * 7);
   const fit = clamp(50 + signals.length * 10 - dislikeHits.length * 4);
-  const friction = clamp(35 + concerns.length * 7);
+  const friction = clamp(35 + concerns.length * 7 + ruleHits.length * 4);
   const conversion = clamp(Math.round((trust + fit + (100 - friction)) / 3));
 
   return {
@@ -53,6 +57,7 @@ export function evaluateFallback({ url, goal, profile, browserResult = null }) {
     ],
     signals,
     concerns: [...concerns, ...dislikeHits],
+    ruleHits,
     verdict: conversion >= 70 ? "continue" : conversion >= 45 ? "hesitate" : "leave"
   };
 }
