@@ -45,3 +45,36 @@ export function validateProfile(profile) {
   if (!profile.budget) throw new Error("Profile must include budget.");
   return profile;
 }
+
+export function explainProfile(profile) {
+  validateProfile(profile);
+  const lines = [
+    `Profile: ${profile.name}`,
+    "",
+    profile.summary || "No summary provided.",
+    "",
+    "Decision shape:",
+    `- Impulse budget: $${profile.budget.maxImpulseBuyUsd}`,
+    `- Research budget: $${profile.budget.maxResearchBuyUsd}`,
+    `- Max signup steps: ${profile.patience.maxSignupSteps}`,
+    `- Leaves if pricing hidden: ${Boolean(profile.patience.leavesIfPricingHidden)}`,
+    `- Leaves if demo missing: ${Boolean(profile.patience.leavesIfDemoMissing)}`,
+    "",
+    "Likes:",
+    ...(profile.preferences.likes || []).map((item) => `- ${item}`),
+    "",
+    "Dislikes:",
+    ...(profile.preferences.dislikes || []).map((item) => `- ${item}`),
+    "",
+    "Risk checks:",
+    `- Avoids unknown payment pages: ${Boolean(profile.risk?.avoidsUnknownPaymentPages)}`,
+    `- Requires refund policy: ${Boolean(profile.risk?.requiresRefundPolicy)}`,
+    `- Requires data policy: ${Boolean(profile.risk?.requiresClearDataPolicy)}`,
+    "",
+    "Voice:",
+    `- Tone: ${profile.writingStyle?.tone || "unspecified"}`,
+    `- Notes: ${profile.writingStyle?.notes || "unspecified"}`
+  ];
+
+  return lines.join("\n");
+}

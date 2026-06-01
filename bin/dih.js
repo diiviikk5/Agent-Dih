@@ -5,7 +5,7 @@ import { formatAdapters, listAdapters, runBrowserAdapter } from "../src/adapters
 import { evaluateFallback } from "../src/evaluator.js";
 import { createRunDir, latestRun, writeJson, writeText } from "../src/files.js";
 import { collectPageEvidence } from "../src/pageEvidence.js";
-import { initProfile, loadProfile, validateProfile } from "../src/profile.js";
+import { explainProfile, initProfile, loadProfile, validateProfile } from "../src/profile.js";
 import { renderReport } from "../src/report.js";
 
 function printHelp() {
@@ -14,6 +14,7 @@ function printHelp() {
 Usage:
   dih init [profile.json]
   dih check <profile.json>
+  dih explain <profile.json>
   dih test <url> --profile <profile.json> --goal "<goal>"
   dih compare <url...> --profile <profile.json> --goal "<goal>"
   dih latest <profile.json>
@@ -63,6 +64,14 @@ try {
     const profile = JSON.parse(await readFile(resolve(process.cwd(), path), "utf8"));
     validateProfile(profile);
     console.log(`Profile OK: ${profile.name}`);
+    process.exit(0);
+  }
+
+  if (command === "explain") {
+    const path = args[1];
+    if (!path) throw new Error("Missing profile path.");
+    const profile = await loadProfile(resolve(process.cwd(), path));
+    console.log(explainProfile(profile));
     process.exit(0);
   }
 
